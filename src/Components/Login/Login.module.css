@@ -1,0 +1,47 @@
+.form {
+  margin: 0 auto;
+
+  max-width: 350px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.inputWrap {
+  margin-bottom: 20px;
+
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.label {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.input {
+  padding: 10px;
+
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.buttonWrap {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+}
+
+.info {
+  text-align: center;
+  font-size: 24px;
+}
+
+.username {
+  font-weight: 700;
+}
