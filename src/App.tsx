@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, HashRouter } from 'react-router-dom';
 
 import NavBar from './Components/NavBar/NavBar';
 import Login from './Components/Login/Login';
@@ -11,7 +11,7 @@ import styles from './App.module.css';
 function App() {
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className={ styles.container }>
         <NavBar />
         <Routes> 
@@ -21,7 +21,7 @@ function App() {
           <Route path='/short-links' element = { <MainPage /> } />
         </Routes>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
