@@ -14,6 +14,7 @@ const CLEAR_LINKS_DATA = 'links/CLEAR-LINKS-DATA';
 const SET_SORT = '/links/SET-SORT';
 const SET_TOTAL_COUNT_LINKS = '/links/SET-TOTAL-COUNT-LINKS';
 const SET_CURRENT_PAGE_NUMBER = '/links/SET-CURRENT-PAGE-NUMBER';
+const SET_IS_LINKS_IN_PROGRESS = '/links/SET-IS-LINKS-IN-PROGRESS';
 
 export type TLinks = {
   id: number
@@ -37,15 +38,17 @@ type TSetSort = { type: typeof SET_SORT, sortType: ESortTypes }
 type TClearLinksData = { type: typeof CLEAR_LINKS_DATA }
 type TSetTotalCountLinks = { type: typeof SET_TOTAL_COUNT_LINKS, totalCountLinks: number }
 type TSetCurrentPageNumber = { type: typeof SET_CURRENT_PAGE_NUMBER, pageNumber: number }
+type TSetIsLinksInProgress = { type: typeof SET_IS_LINKS_IN_PROGRESS, isLinksInProgress: boolean}
 
-type TActions = TSetLinksData | TClearLinksData | TAddLink | TSetSort | TSetTotalCountLinks | TSetCurrentPageNumber;
+type TActions = TSetLinksData | TClearLinksData | TAddLink | TSetSort | TSetTotalCountLinks | TSetCurrentPageNumber | TSetIsLinksInProgress;
 
 const initialState = {
   links: [] as Array<TLinks>,
   sortType: ESortTypes.shortASC,
   pageSize: 10,
   totalCountLinks: 0,
-  currentPageNumber: 1
+  currentPageNumber: 1,
+  isLinksInProgress: false
 } 
 
 export type TLinksReducerState = typeof initialState;
@@ -89,6 +92,12 @@ const linksReducer = (state = initialState, action: TActions): TLinksReducerStat
         currentPageNumber: action.pageNumber
       }
 
+    case SET_IS_LINKS_IN_PROGRESS:
+      return {
+        ...state,
+        isLinksInProgress: action.isLinksInProgress
+      }
+
     default:
       return state
   }
@@ -100,6 +109,7 @@ export const addLink = (link: TLinks): TAddLink => ({ type: ADD_LINK, link });
 export const setLinksData = (links: Array<TLinks>): TSetLinksData => ({ type: SET_LINKS_DATA, links });
 export const setTotalCountLinks = (totalCountLinks: number): TSetTotalCountLinks => ({ type: SET_TOTAL_COUNT_LINKS, totalCountLinks });
 export const setCurrentPageNumber = (pageNumber: number): TSetCurrentPageNumber => ({ type: SET_CURRENT_PAGE_NUMBER, pageNumber });
+export const setIsLinksInProgress = (isLinksInProgress: boolean): TSetIsLinksInProgress => ({ type: SET_IS_LINKS_IN_PROGRESS, isLinksInProgress })
 
 export const createShortLink = (link: string): ThunkAction<void, TAppState, unknown, TActions> => async (dispatch, getState) => {
   const token = getAuthToken(getState());
@@ -112,11 +122,18 @@ export const createShortLink = (link: string): ThunkAction<void, TAppState, unkn
 }
 
 export const getStatistics = (token: string, order: ESortTypes, limit = 10, offset = 0): ThunkAction<void, TAppState, unknown, TActions> => async dispatch => {
-  const response = await API.requestStatistics(token, order, limit, offset);
+  dispatch( setIsLinksInProgress(true) );
 
-  if(response.status === 200) {
-    dispatch( setLinksData(response.data) );
-  }
+  API.requestStatistics(token, order, limit, offset)
+    .then(res => {
+      if(res.status === 200) {
+        dispatch( setLinksData(res.data) );
+      }
+
+      dispatch( setIsLinksInProgress(false) );
+    })
+
+
 }
 
 export const initialGetStatistics = (token: string): ThunkAction<void, TAppState, unknown, TActions> => async dispatch => {
@@ -128,18 +145,25 @@ export const initialGetStatistics = (token: string): ThunkAction<void, TAppState
 }
 
 export const changePage = (pageNumber: number ): ThunkAction<void, TAppState, unknown, TActions> => async (dispatch, getState) => {
+  dispatch( setIsLinksInProgress(true) );
+
   const token = getAuthToken(getState());
   const sortType = getSortType(getState());
   const limit = getPageSize(getState());
 
   const offset = limit * (pageNumber - 1);
 
-  const response = await API.requestStatistics(token, sortType, limit, offset);
+  API.requestStatistics(token, sortType, limit, offset)
+    .then(res => {
+      if(res.status === 200) {
+        dispatch( setLinksData(res.data) );
+        dispatch( setCurrentPageNumber(pageNumber) )
+      }
 
-  if(response.status === 200) {
-    dispatch( setLinksData(response.data) );
-    dispatch( setCurrentPageNumber(pageNumber) )
-  }
+      dispatch( setIsLinksInProgress(false) );
+    })
+
+
 }
 
 export default linksReducer;

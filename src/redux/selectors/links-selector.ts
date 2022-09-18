@@ -6,3 +6,4 @@ export const getSortType = (state: TAppState): ESortTypes => state.links.sortTyp
 export const getPageSize = (state: TAppState): number => state.links.pageSize;
 export const getTotalCountLinks = (state: TAppState): number => state.links.totalCountLinks;
 export const getCurrentPageNumber = (state: TAppState): number => state.links.currentPageNumber;
+export const getIsLinksInProgress = (state: TAppState): boolean => state.links.isLinksInProgress;

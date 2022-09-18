@@ -4,7 +4,8 @@ import { useAppDispatch } from "../../redux/store";
 
 import styles from './Login.module.css'
 import { useSelector } from 'react-redux';
-import { getIsAuth, getLoginError, getUserName } from './../../redux/selectors/auth-selector';
+import { getIsAuth, getIsAuthInProgress, getLoginError, getUserName } from './../../redux/selectors/auth-selector';
+import Spinner from "../common/Spinner/Spinner";
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,6 +13,7 @@ const Login = () => {
 
   const loginError = useSelector( getLoginError );
   const isAuth = useSelector( getIsAuth );
+  const isAuthInProgress = useSelector( getIsAuthInProgress );
   const user = useSelector( getUserName );
 
   const dispatch = useAppDispatch();
@@ -30,23 +32,26 @@ const Login = () => {
   }
 
   return (
-    isAuth ? <p className={styles.info}> You are logged in as <span className={styles.username}>{user}</span> </p>
-      :<form className = { styles.form } onSubmit = { loginClick }>
-        <div className = { styles.inputWrap }>
-          <label htmlFor="login__username" className = { styles.label }>Username:</label>
-          <input required = { true } type="text" name="username" id="login__username" className = { styles.input }
-            placeholder = { 'Username' } value = {username} onChange = { usernameChange }/>
-        </div>
-        <div className = { styles.inputWrap }>
-          <label htmlFor="login__password" className = { styles.label }>Password:</label>
-          <input required = { true } type="password" name="password" id="login__password" className = { styles.input }
-            placeholder = { 'Password' }  value = {password} onChange = { passwordChange }/>
-        </div>
-        { loginError && <p>{loginError}</p> }
-        <div className = { styles.buttonWrap }>
-          <button className = 'btn btn--login' >Log In</button>
-        </div>
-      </form>
+    isAuthInProgress 
+      ? <Spinner />
+      : isAuth 
+        ? <p className={styles.info}> You are logged in as <span className={styles.username}>{user}</span> </p>
+        :<form className = { styles.form } onSubmit = { loginClick }>
+          <div className = { styles.inputWrap }>
+            <label htmlFor="login__username" className = { styles.label }>Username:</label>
+            <input required = { true } type="text" name="username" id="login__username" className = { styles.input }
+              placeholder = { 'Username' } value = {username} onChange = { usernameChange }/>
+          </div>
+          <div className = { styles.inputWrap }>
+            <label htmlFor="login__password" className = { styles.label }>Password:</label>
+            <input required = { true } type="password" name="password" id="login__password" className = { styles.input }
+              placeholder = { 'Password' }  value = {password} onChange = { passwordChange }/>
+          </div>
+          { loginError && <p>{loginError}</p> }
+          <div className = { styles.buttonWrap }>
+            <button className = 'btn btn--login' >Log In</button>
+          </div>
+        </form>
   )
 }
 
