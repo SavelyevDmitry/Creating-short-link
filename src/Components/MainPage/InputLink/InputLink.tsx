@@ -36,7 +36,7 @@ const InputLink: FC<TProps> = ({ token }) => {
           placeholder = 'Link' value = { linkInputText } onChange = { linkTextChange } />
       </div>
       <div>
-        <button className = 'btn' >Create shot link</button>
+        <button className = 'btn' >Create short link</button>
       </div>
     </form>
   )
